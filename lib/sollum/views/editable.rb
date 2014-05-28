@@ -1,7 +1,7 @@
 module Precious
   module Editable
     def formats(selected = @page.format)
-      Gollum::Markup.formats.map do |key, val|
+      Sollum::Markup.formats.map do |key, val|
         { :name     => val[:name],
           :id       => key.to_s,
           :selected => selected == key }

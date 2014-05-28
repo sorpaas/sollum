@@ -76,7 +76,7 @@ module Precious
 
       def next_link
         label = "Next &raquo;"
-        if @versions.size == Gollum::Page.per_page
+        if @versions.size == Sollum::Page.per_page
           link = "/history/#{@page.name}?page=#{@page_num+1}"
           %(<a href="#{link}" hotkey="l">#{label}</a>)
         else

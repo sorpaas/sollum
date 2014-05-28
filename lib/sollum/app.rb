@@ -1,21 +1,21 @@
 # ~*~ encoding: utf-8 ~*~
 require 'cgi'
 require 'sinatra'
-require 'gollum-lib'
+require 'Sollum-lib'
 require 'mustache/sinatra'
 require 'useragent'
 require 'stringex'
 
-require 'gollum'
-require 'gollum/views/layout'
-require 'gollum/views/editable'
-require 'gollum/views/has_page'
+require 'sollum'
+require 'sollum/views/layout'
+require 'sollum/views/editable'
+require 'sollum/views/has_page'
 
 require File.expand_path '../helpers', __FILE__
 
 #required to upload bigger binary files
-Gollum::set_git_timeout(120)
-Gollum::set_git_max_filesize(190 * 10**6)
+Sollum::set_git_timeout(120)
+Sollum::set_git_max_filesize(190 * 10**6)
 
 # Fix to_url
 class String
@@ -32,7 +32,7 @@ end
 # There are a number of wiki options that can be set for the frontend
 #
 # Example
-# require 'gollum/app'
+# require 'Sollum/app'
 # Precious::App.set(:wiki_options, {
 #     :universal_toc => false,
 # }
@@ -60,7 +60,7 @@ module Precious
     end
 
     # We want to serve public assets for now
-    set :public_folder, "#{dir}/public/gollum"
+    set :public_folder, "#{dir}/public/Sollum"
     set :static, true
     set :default_markup, :markdown
 
@@ -116,7 +116,7 @@ module Precious
     end
 
     def wiki_new
-      Gollum::Wiki.new(settings.gollum_path, settings.wiki_options)
+      Sollum::Wiki.new(settings.Sollum_path, settings.wiki_options)
     end
 
     get '/data/*' do
@@ -176,13 +176,13 @@ module Precious
           :message => "Uploaded file to #{dir}/#{reponame}",
           :parent  => wiki.repo.head.commit,
       }
-      author  = session['gollum.author']
+      author  = session['Sollum.author']
       unless author.nil?
         options.merge! author
       end
 
       begin
-        committer = Gollum::Committer.new(wiki, options)
+        committer = Sollum::Committer.new(wiki, options)
         committer.add_to_index(dir, filename, format, contents)
         committer.after_commit do |committer, sha|
           wiki.clear_cache
@@ -190,7 +190,7 @@ module Precious
         end
         committer.commit
         redirect to(request.referer)
-      rescue Gollum::DuplicatePageError => e
+      rescue Sollum::DuplicatePageError => e
         @message = "Duplicate page: #{e.message}"
         mustache :error
       end
@@ -215,7 +215,7 @@ module Precious
         rename                    = "#{target_dir}/#{target_name}"
       end
 
-      committer = Gollum::Committer.new(wiki, commit_message)
+      committer = Sollum::Committer.new(wiki, commit_message)
       commit    = { :committer => committer }
 
       success = wiki.rename_page(page, rename, commit)
@@ -238,7 +238,7 @@ module Precious
       wiki      = wiki_new
       page      = wiki.paged(page_name, path, exact = true)
       return if page.nil?
-      committer = Gollum::Committer.new(wiki, commit_message)
+      committer = Sollum::Committer.new(wiki, commit_message)
       commit    = { :committer => committer }
 
       update_wiki_page(wiki, page, params[:content], commit, page.name, params[:format])
@@ -298,7 +298,7 @@ module Precious
 
         page_dir = settings.wiki_options[:page_file_dir].to_s
         redirect to("/#{clean_url(::File.join(page_dir, path, name))}")
-      rescue Gollum::DuplicatePageError => e
+      rescue Sollum::DuplicatePageError => e
         @message = "Duplicate page: #{e.message}"
         mustache :error
       end
@@ -418,7 +418,7 @@ module Precious
     }x do |path|
       @path        = extract_path(path) if path
       wiki_options = settings.wiki_options.merge({ :page_file_dir => @path })
-      wiki         = Gollum::Wiki.new(settings.gollum_path, wiki_options)
+      wiki         = Sollum::Wiki.new(settings.Sollum_path, wiki_options)
       @results     = wiki.pages
       @results     += wiki.files if settings.wiki_options[:show_all]
       @ref         = wiki.ref
@@ -434,7 +434,7 @@ module Precious
 
       # must pass wiki_options to FileView
       # --show-all and --collapse-tree can be set.
-      @results = Gollum::FileView.new(content, options).render_files
+      @results = Sollum::FileView.new(content, options).render_files
       @ref     = wiki.ref
       mustache :file_view, { :layout => false }
     end
@@ -492,7 +492,7 @@ module Precious
 
     private
 
-    # Options parameter to Gollum::Committer#initialize
+    # Options parameter to Sollum::Committer#initialize
     #     :message   - The String commit message.
     #     :name      - The String author full name.
     #     :email     - The String email address.
@@ -501,7 +501,7 @@ module Precious
     def commit_message
       msg               = (params[:message].nil? or params[:message].empty?) ? "[no message]" : params[:message]
       commit_message    = { :message => msg }
-      author_parameters = session['gollum.author']
+      author_parameters = session['Sollum.author']
       commit_message.merge! author_parameters unless author_parameters.nil?
       commit_message
     end

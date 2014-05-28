@@ -15,7 +15,7 @@ HELP
 
 require 'optparse'
 require 'rubygems'
-require 'gollum'
+require 'sollum'
 
 exec         = {}
 options      = { 'port' => 4567, 'bind' => '0.0.0.0' }

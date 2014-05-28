@@ -15,7 +15,7 @@ require File.expand_path('../gollum/uri_encode_component', __FILE__)
 # This is required for Ruby 1.8.7 which gollum still supports.
 $KCODE = 'U' if RUBY_VERSION[0, 3] == '1.8'
 
-module Gollum
+module Sollum
   VERSION = '3.0.0'
 
   def self.assets_path
@@ -38,4 +38,3 @@ module Gollum
     end
   end
 end
-
